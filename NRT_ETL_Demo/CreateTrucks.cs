@@ -35,12 +35,14 @@ namespace NRT_ETL_Demo
 
                 currentTrucks = conn.Query<int>(trucks).FirstOrDefault();
 
-                if (ProbabilityCheck.ShouldCreate(trucksPerHour, currentTrucks))
+                while(ProbabilityCheck.ShouldCreate(trucksPerHour, currentTrucks))
                 {
                     var pallets = ProbabilityCheck.PalletCount();
-                    var enterDC = DateTime.Now;
+                    var enterDC = DateTime.UtcNow;
 
                     conn.Execute(addTruck, new { pallets, enterDC });
+
+                    currentTrucks++;
                 }
 
             }

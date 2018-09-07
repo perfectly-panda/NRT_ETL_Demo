@@ -22,7 +22,7 @@ namespace NRT_ETL_Demo
 
             }
 
-            var variant = rand.NextDouble() - .5;
+            var variant = (rand.NextDouble() - .5) ;
 
             percent = percent + variant;
 

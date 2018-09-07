@@ -17,5 +17,8 @@ namespace Models
         public DateTime? DockEndTime { get; set; }
         public DateTime? LeaveDCTime { get; set; }
 
+        public DateTime Stamp { get; set; }
+        public DateTime NextStamp { get; set; }
+
     }
 }
