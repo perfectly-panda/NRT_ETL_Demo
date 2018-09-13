@@ -5,13 +5,16 @@ using System.Linq;
 using Dapper;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.WebJobs.ServiceBus;
+using Models;
+using Newtonsoft.Json;
 
 namespace NRT_ETL_Demo
 {
     public static class CreateTrucks
     {
         [FunctionName("CreateTrucks")]
-        public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, [EventHub("truckevent", Connection = "EventHub")]ICollector<string> outputEventHubMessage, TraceWriter log)
         {
             int trucksPerHour;
             int currentTrucks;
@@ -25,7 +28,7 @@ namespace NRT_ETL_Demo
             var addTruck = @"INSERT INTO dbo.Truck
                     (Pallets, EnterDCTime)
                     VALUES
-                    (@pallets, @enterDC)";
+                    (@Pallets, @EnterDCTime)";
 
             var str = ConfigurationManager.ConnectionStrings["DatabaseConnection"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(str))
@@ -37,10 +40,16 @@ namespace NRT_ETL_Demo
 
                 while(ProbabilityCheck.ShouldCreate(trucksPerHour, currentTrucks))
                 {
-                    var pallets = ProbabilityCheck.PalletCount();
-                    var enterDC = DateTime.UtcNow;
+                    var truck = new Truck();
 
-                    conn.Execute(addTruck, new { pallets, enterDC });
+                    truck.Pallets = ProbabilityCheck.PalletCount();
+                    truck.EnterDCTime = DateTime.UtcNow;
+
+                    string json = JsonConvert.SerializeObject(truck);
+
+                    outputEventHubMessage.Add(json);
+
+                    conn.Execute(addTruck, truck);
 
                     currentTrucks++;
                 }

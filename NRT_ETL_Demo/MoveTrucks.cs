@@ -6,14 +6,17 @@ using System.Linq;
 using Dapper;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.WebJobs.ServiceBus;
 using Models;
+using Newtonsoft.Json;
 
 namespace NRT_ETL_Demo
 {
     public static class MoveTrucks
     {
         [FunctionName("MoveTrucks")]
-        public static void Run([TimerTrigger("*/15 * * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static void Run([TimerTrigger("*/15 * * * * *")]TimerInfo myTimer, TraceWriter log,
+            [EventHub("truckevent", Connection = "EventHub")] ICollector<string> outputEventHubMessage)
         {
             log.Info($"C# Timer trigger function executed at: {DateTime.Now}");
 
@@ -83,30 +86,83 @@ namespace NRT_ETL_Demo
             {
                 var checkInt = Int32.Parse(conn.Query<string>(settingQuery).FirstOrDefault());
 
-                conn.Execute(trucksEnterDCUpdate, UpdateTrucks(conn.Query<TruckCheck>(trucksEnterDCSelect).ToList(), checkInt));
-                conn.Execute(dockStartUpdate, UpdateTrucks(conn.Query<TruckCheck>(dockStartSelect).ToList(), checkInt));
-                conn.Execute(unloadEndUpdate, UpdateTrucks(conn.Query<TruckCheck>(unloadEndSelect).ToList(), checkInt));
-                conn.Execute(dockEndUpdate, UpdateTrucks(conn.Query<TruckCheck>(dockEndSelect).ToList(), checkInt));
+                var enterDC = conn.Query<Truck>(trucksEnterDCSelect).ToList();
 
-            }
-        }
-
-        private static List<TruckCheck> UpdateTrucks(List<TruckCheck> trucks, int checkInt)
-        {
-            List<TruckCheck> toMove = new List<TruckCheck>();
-
-            foreach(var truck in trucks)
-            {
-                var span = (DateTime.Now - truck.Stamp).Minutes;
-
-                if (ProbabilityCheck.ShouldCreate(checkInt, span))
+                foreach(var truck in enterDC)
                 {
-                    truck.NextStamp = DateTime.UtcNow;
-                    toMove.Add(truck);
-                }
-            }
+                    var span = (DateTime.Now - truck.Stamp).Minutes;
 
-            return toMove;
+                    if (ProbabilityCheck.ShouldCreate(span, checkInt))
+                    {
+                        truck.NextStamp = DateTime.UtcNow;
+                        truck.DockStartTime = DateTime.UtcNow;
+
+                        string json = JsonConvert.SerializeObject(truck);
+
+                        outputEventHubMessage.Add(json);
+
+                        conn.Execute(trucksEnterDCUpdate, truck);
+                    }
+                }
+
+                var dockStart = conn.Query<Truck>(dockStartSelect).ToList();
+
+                foreach (var truck in dockStart)
+                {
+                    var span = (DateTime.Now - truck.Stamp).Minutes;
+
+                    if (ProbabilityCheck.ShouldCreate(span, checkInt))
+                    {
+                        truck.NextStamp = DateTime.UtcNow;
+                        truck.UnloadStartTime = DateTime.UtcNow;
+
+                        string json = JsonConvert.SerializeObject(truck);
+
+                        outputEventHubMessage.Add(json);
+
+                        conn.Execute(dockStartUpdate, truck);
+                    }
+                }
+
+                var unloadEnd = conn.Query<Truck>(unloadEndSelect).ToList();
+
+                foreach (var truck in unloadEnd)
+                {
+                    var span = (DateTime.Now - truck.Stamp).Minutes;
+
+                    if (ProbabilityCheck.ShouldCreate(span, checkInt))
+                    {
+                        truck.NextStamp = DateTime.UtcNow;
+                        truck.DockEndTime = DateTime.UtcNow;
+
+                        string json = JsonConvert.SerializeObject(truck);
+
+                        outputEventHubMessage.Add(json);
+
+                        conn.Execute(unloadEndUpdate, truck);
+                    }
+                }
+
+                var dockEnd = conn.Query<Truck>(dockEndSelect).ToList();
+
+                foreach (var truck in dockEnd)
+                {
+                    var span = (DateTime.Now - truck.Stamp).Minutes;
+
+                    if (ProbabilityCheck.ShouldCreate(span, checkInt))
+                    {
+                        truck.NextStamp = DateTime.UtcNow;
+                        truck.LeaveDCTime = DateTime.UtcNow;
+
+                        string json = JsonConvert.SerializeObject(truck);
+
+                        outputEventHubMessage.Add(json);
+
+                        conn.Execute(dockEndUpdate, truck);
+                    }
+                }
+
+            }
         }
     }
 }

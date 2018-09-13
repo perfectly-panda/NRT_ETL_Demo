@@ -5,15 +5,19 @@ using System.Linq;
 using Dapper;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.WebJobs.ServiceBus;
 using Models;
+using Newtonsoft.Json;
 
 namespace NRT_ETL_Demo
 {
     public static class UnloadTrucks
     {
         [FunctionName("UnloadTrucks")]
-        public static void Run([TimerTrigger("*/15 * * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static void Run([TimerTrigger("*/15 * * * * *")]TimerInfo myTimer, TraceWriter log,
+            [EventHub("truckevent", Connection = "EventHub")] ICollector<string> outputEventHubMessage)
         {
+
             var unloadSelect = @"SELECT TruckId ,[Pallets]
                           ,[EnterDCTime]
                           ,[DockStartTime]
@@ -37,7 +41,7 @@ namespace NRT_ETL_Demo
             {
                 var setting = Int32.Parse(conn.Query<string>(settingQuery).FirstOrDefault());
 
-                var unloads = conn.Query<TruckCheck>(unloadSelect).ToList();
+                var unloads = conn.Query<Truck>(unloadSelect).ToList();
 
                 foreach (var truck in unloads)
                 {
@@ -46,6 +50,11 @@ namespace NRT_ETL_Demo
                     if (ProbabilityCheck.ShouldCreate(truck.Pallets, (int)Math.Floor(setting * time)))
                     {
                         truck.NextStamp = DateTime.UtcNow;
+                        truck.UnloadEndTime = DateTime.UtcNow;
+
+                        string json = JsonConvert.SerializeObject(truck);
+
+                        outputEventHubMessage.Add(json);
 
                         conn.Execute(unloadUpdate, truck);
                     }
