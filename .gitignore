@@ -331,3 +331,6 @@ ASALocalRun/
 
 #functions local
 local.settings.json
+
+#.net core
+appsettings.json
