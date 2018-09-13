@@ -334,3 +334,4 @@ local.settings.json
 
 #.net core
 appsettings.json
+NRTDemoWeb/appsettings.json
