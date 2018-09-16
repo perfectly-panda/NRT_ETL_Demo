@@ -50,7 +50,7 @@ namespace NRT_ETL_Demo
                     if (ProbabilityCheck.ShouldCreate(truck.Pallets, (int)Math.Floor(setting * time)))
                     {
                         truck.NextStamp = DateTime.UtcNow;
-                        truck.UnloadEndTime = DateTime.UtcNow;
+                        truck.UnloadStopTime = DateTime.UtcNow;
 
                         string json = JsonConvert.SerializeObject(truck);
 

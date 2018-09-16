@@ -1,29 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Models;
 using NRTDemoWeb.Repos;
 
 namespace NRTDemoWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class TruckController : ControllerBase
     {
+        private readonly IConfiguration Config;
+
+        // Constructor that that takes IConfiguration is called on instantiation thanks to Dependency injection
+        public TruckController(IConfiguration config)
+        {
+            Config = config;
+        }
 
         // GET api/trucks
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<IEnumerable<Truck>> Get()
         {
-            return new string[] { "value1", "value2" };
+            using(IDbConnection conn = new SqlConnection(Config["ConnectionStrings:DatabaseConnection"]))
+            {
+                var repo = new TruckRepository(conn);
+
+                return repo.GetActiveTrucks().ToList();
+
+            }
         }
 
         // GET api/trucks/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<Truck> Get(int id)
         {
-            return "value";
+            using (IDbConnection conn = new SqlConnection(Config["ConnectionStrings:DatabaseConnection"]))
+            {
+                var repo = new TruckRepository(conn);
+
+                return repo.GetTruck(id);
+
+            }
         }
+
+
     }
 }

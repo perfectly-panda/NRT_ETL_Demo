@@ -15,7 +15,7 @@ namespace NRT_ETL_Demo
     public static class MoveTrucks
     {
         [FunctionName("MoveTrucks")]
-        public static void Run([TimerTrigger("*/15 * * * * *")]TimerInfo myTimer, TraceWriter log,
+        public static void Run([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer, TraceWriter log,
             [EventHub("truckevent", Connection = "EventHub")] ICollector<string> outputEventHubMessage)
         {
             log.Info($"C# Timer trigger function executed at: {DateTime.Now}");

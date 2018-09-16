@@ -33,6 +33,9 @@ namespace NRTDemoWeb
         {
             services.AddSpaStaticFiles();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSignalR();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,10 +53,18 @@ namespace NRTDemoWeb
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
             app.UseStaticFiles();
-            app.UseSignalR(routes => {
-                routes.MapHub<TruckHub>("Truck");
-            });
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                );
+
             app.UseMvc();
+            app.UseSignalR(routes => {
+                routes.MapHub<TruckHub>("/TruckHub");
+                routes.MapHub<NotificationHub>("/NotificationHub");
+            });
         }
     }
 }

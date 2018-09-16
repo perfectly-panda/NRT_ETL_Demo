@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GridEvent.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Truck.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

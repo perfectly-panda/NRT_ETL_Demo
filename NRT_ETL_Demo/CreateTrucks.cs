@@ -14,7 +14,9 @@ namespace NRT_ETL_Demo
     public static class CreateTrucks
     {
         [FunctionName("CreateTrucks")]
-        public static void Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, [EventHub("truckevent", Connection = "EventHub")]ICollector<string> outputEventHubMessage, TraceWriter log)
+        public static void Run([TimerTrigger("*/5 * * * * *")]TimerInfo myTimer, 
+            [EventHub("truckevent", Connection = "EventHub")]ICollector<string> outputEventHubMessage,
+            TraceWriter log)
         {
             int trucksPerHour;
             int currentTrucks;
@@ -27,6 +29,7 @@ namespace NRT_ETL_Demo
 
             var addTruck = @"INSERT INTO dbo.Truck
                     (Pallets, EnterDCTime)
+                    OUTPUT inserted.TruckId
                     VALUES
                     (@Pallets, @EnterDCTime)";
 
@@ -44,12 +47,14 @@ namespace NRT_ETL_Demo
 
                     truck.Pallets = ProbabilityCheck.PalletCount();
                     truck.EnterDCTime = DateTime.UtcNow;
+                    
+                    var truckId = conn.Query<int>(addTruck, truck).FirstOrDefault();
+
+                    truck.TruckId = truckId;
 
                     string json = JsonConvert.SerializeObject(truck);
 
                     outputEventHubMessage.Add(json);
-
-                    conn.Execute(addTruck, truck);
 
                     currentTrucks++;
                 }
