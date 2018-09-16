@@ -1,15 +1,30 @@
 <template>
   <v-app id="app" dark>
-            <v-navigation-drawer fixed right width="375" app>
-            <TruckList v-bind:trucks="trucks" ></TruckList>
+        <v-navigation-drawer fixed right width="375" app>
+        <TruckList 
+          v-bind:trucks="trucks" 
+          v-on:selectTruck="onSetActive">
+        </TruckList>
         </v-navigation-drawer>
     <v-content>
         <v-container>
-          <StatusBoard v-bind:trucks="trucks" v-bind:mostRecent="mostRecent"></StatusBoard>
+          <v-layout row wrap>
+            <v-flex xs12>
+              <Header v-bind:note="lastNotification"></Header>
+            </v-flex>
+            <v-flex xs12>
+              <StatusBoard 
+                v-bind:trucks="trucks" 
+                v-bind:mostRecent="mostRecent"
+                v-bind:activeTruck="activeTruck"
+                v-on:selectTruck="onSetActive"
+                v-on:moveTruck="onMove"></StatusBoard>
+            </v-flex>
+          </v-layout>
         </v-container>
       </v-content>
     <v-footer height="250">
-      <v-layout>
+      <v-layout class="scroll-y">
         <Notifications v-bind:notifications="notifications"></Notifications>
         </v-layout>
     </v-footer>
@@ -20,6 +35,7 @@
 import TruckList from './components/TruckList.vue'
 import StatusBoard from './components/StatusBoard.vue'
 import Notifications from './components/Notifications.vue'
+import Header from './components/Header.vue'
 
 import axios from 'axios'
 
@@ -30,7 +46,8 @@ export default {
   components: {
     TruckList,
     StatusBoard,
-    Notifications
+    Notifications,
+    Header
   },
   mounted: function() {
     axios
@@ -61,11 +78,16 @@ export default {
       trucks: null,
       mostRecent: null,
       notifications: null,
-      lastNotification: null
+      lastNotification: null,
+      activeTruck: null
     }
   },
   methods: {
     processTruck(truckId, truck){
+        if(this.activeTruck && this.activeTruck.truckId == truckId){
+          this.activeTruck = truck;
+        }
+
         for(var i = 0; i < this.trucks.length; i++){
         if(this.trucks[i].truckId == truckId){
           if(truck.leaveDCTime){
@@ -85,9 +107,8 @@ export default {
       this.mostRecent.truckId = truckId;
     },
     processNotification(notification){
-      console.log(notification);
       if(this.notifications){
-        while(this.notifications.length > 4){
+        while(this.notifications.length > 9){
           this.notifications.shift();
         }
       }
@@ -100,6 +121,15 @@ export default {
       }
 
       this.lastNotification = notification;
+    },
+    onSetActive(value){
+      this.activeTruck = value;
+    },
+    onMove(value){
+      console.log("move truck: " + value.truckId);
+      var url = 'https://nrtdemoweb.azurewebsites.net/api/truck/Move/' + value.truckId;
+       axios
+        .get(url);
     }
   }
 }

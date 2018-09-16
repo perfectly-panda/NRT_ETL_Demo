@@ -1,17 +1,17 @@
 <template>
 <div>
-    <v-list-tile v-for="note in notifications" :key="note.messageText" class="truckItem mb-4">   
-    <v-list dense>
-        <v-list-tile-content>
-        <v-list-tile-title>
-            {{note.level}}
-        </v-list-tile-title>
-        <v-list-tile-sub-title>
-            {{note.messageText}}
-        </v-list-tile-sub-title>
-        </v-list-tile-content>
+    <v-list dense xs12 class="overflow-hidden">
+        <v-list-tile 
+            v-for="note in notifications" 
+            :key="note.messageText" 
+            v-bind:class="note.level + '2'">
+            <v-list-tile-content>
+                <v-list-tile-title>
+                    {{note.level}}  -  {{note.messageText}}
+                </v-list-tile-title>
+            </v-list-tile-content>
+        </v-list-tile>
     </v-list>
-    </v-list-tile>
     </div>
 </template>
 
@@ -20,8 +20,21 @@ export default {
   name: 'Notifications',
   props: {
     notifications: null
-  },
-  data: function(){
   }
 }
 </script>
+
+<style>
+    .Error2 {
+        color: #B71c1c;
+        font-weight: bold;
+    }
+
+    .Warning2 {
+        color: #F9A825;
+    }
+
+    .Info2 {
+        color: #FAFAFA;
+    }
+</style>

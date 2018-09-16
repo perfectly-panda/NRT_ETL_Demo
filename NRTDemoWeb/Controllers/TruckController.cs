@@ -49,6 +49,70 @@ namespace NRTDemoWeb.Controllers
             }
         }
 
+        [HttpGet("Create/{pallets}")]
+        public ActionResult CreateTruck(int pallets)
+        {
+            using (IDbConnection conn = new SqlConnection(Config["ConnectionStrings:DatabaseConnection"]))
+            {
+                var repo = new TruckRepository(conn);
+
+                var truck = new Truck()
+                {
+                    Pallets = pallets,
+                    EnterDCTime = DateTime.UtcNow
+                };
+
+                var result = repo.CreateTruck(truck);
+
+                var eventHub = new TruckEventHub(Config);
+
+                eventHub.SendTruck(result);
+
+                return Ok();
+
+            }
+        }
+
+        [HttpGet("Move/{id}")]
+        public ActionResult MoveTruck(int id)
+        {
+            using (IDbConnection conn = new SqlConnection(Config["ConnectionStrings:DatabaseConnection"]))
+            {
+
+                var repo = new TruckRepository(conn);
+
+                var result = repo.GetTruck(id);
+
+                switch (result.Status)
+                {
+                    case 1:
+                        result.DockStartTime = DateTime.UtcNow;
+                        break;
+                    case 2:
+                        result.UnloadStartTime = DateTime.UtcNow;
+                        break;
+                    case 3:
+                        result.UnloadStopTime = DateTime.UtcNow;
+                        break;
+                    case 4:
+                        result.DockEndTime = DateTime.UtcNow;
+                        break;
+                    case 5:
+                        result.LeaveDCTime = DateTime.UtcNow;
+                        break;
+                }
+
+                result = repo.UpdateTruck(result);
+
+                var eventHub = new TruckEventHub(Config);
+
+                eventHub.SendTruck(result);
+
+                return Ok();
+
+            }
+        }
+
 
     }
 }

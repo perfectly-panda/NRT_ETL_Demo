@@ -3,7 +3,7 @@
         <v-layout row wrap float>
             <v-flex xs2>
                 <v-card>
-                    <v-card-title>
+                    <v-card-title class="headline">
                         On Location:
                     </v-card-title>
                     <v-divider></v-divider>
@@ -12,7 +12,7 @@
             </v-flex>
             <v-flex xs2>
                 <v-card>
-                    <v-card-title>
+                    <v-card-title class="headline">
                         On Dock:
                     </v-card-title>
                     <v-divider></v-divider>
@@ -21,7 +21,7 @@
             </v-flex>
             <v-flex xs2>
                 <v-card>
-                    <v-card-title>
+                    <v-card-title class="headline">
                         Unloading:
                     </v-card-title>
                     <v-divider></v-divider>
@@ -30,8 +30,8 @@
             </v-flex>
             <v-flex xs2>
                 <v-card>
-                    <v-card-title>
-                        Unloading Complete:
+                    <v-card-title class="headline">
+                        Unload Complete:
                     </v-card-title>
                     <v-divider></v-divider>
                     <v-card-text class="display-4">{{getCount(4,trucks)}}</v-card-text>
@@ -39,7 +39,7 @@
             </v-flex>
             <v-flex xs2>
                 <v-card>
-                    <v-card-title>
+                    <v-card-title class="headline">
                         Left Dock:
                     </v-card-title>
                     <v-divider></v-divider>
@@ -48,62 +48,32 @@
             </v-flex>
             <v-flex xs2>
                 <v-card v-if="trucks">
-                    <v-card-title>
+                    <v-card-title class="headline">
                         Total On Site:
                     </v-card-title>
                     <v-divider></v-divider>
                     <v-card-text class="display-4">{{trucks.length}}</v-card-text>
                 </v-card>
             </v-flex>
-            <v-flex xs4>
-                <v-card v-if="mostRecent">
-                    <v-card-title>
-                        Last Event:
-                    </v-card-title>
-                    <v-divider></v-divider>
-                    <v-list dense>
-                        <v-list-tile>
-                        <v-list-tile-content>Truck Id:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ mostRecent.truckId }}</v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
-                    <v-list dense>
-                        <v-list-tile>
-                        <v-list-tile-content>On Location:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{mostRecent.enterDCTime | formatDate }}</v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
-                    <v-list dense>
-                        <v-list-tile>
-                        <v-list-tile-content>OnDock:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{mostRecent.dockStartTime | formatDate }}</v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
-                    <v-list dense>
-                        <v-list-tile>
-                        <v-list-tile-content>Unloading:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{mostRecent.unloadStartTime | formatDate }}</v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
-                    <v-list dense>
-                        <v-list-tile>
-                        <v-list-tile-content>Unload Complete:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{mostRecent.unloadStopTime | formatDate }}</v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
-                    <v-list dense>
-                        <v-list-tile>
-                        <v-list-tile-content>Left Dock:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{mostRecent.dockEndTime | formatDate }}</v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
-                    <v-list dense>
-                        <v-list-tile>
-                        <v-list-tile-content>Left Location:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{mostRecent.leaveDCTime | formatDate }}</v-list-tile-content>
-                        </v-list-tile>
-                    </v-list>
-                </v-card>
+             <v-flex xs4>
+                <CreateTruck>
+                </CreateTruck>
+            </v-flex>
+            <v-flex xs4 v-if="mostRecent">
+                <TruckInfo 
+                    v-bind:truck="mostRecent"
+                    v-bind:title="'Last Event:'"
+                    v-on:selectTruck="onSetActive"
+                    v-on:moveTruck="onMove">
+                </TruckInfo>
+            </v-flex>
+            <v-flex xs4 v-if="activeTruck">
+                <TruckInfo 
+                    v-bind:truck="activeTruck"
+                    v-bind:title="'Focused Truck:'"
+                    v-on:selectTruck="onSetActive"
+                    v-on:moveTruck="onMove">
+                </TruckInfo>
             </v-flex>
         </v-layout>
     </v-container>
@@ -112,30 +82,41 @@
 <script>
 import moment from 'moment'
 import Timer from './Timer'
+import TruckInfo from './TruckInfo'
+import CreateTruck from './CreateTruck'
 
 export default {
   name: 'StatusBoard',
   components: {
-    Timer
+    Timer,
+    TruckInfo,
+    CreateTruck
   },
   props: {
     trucks: {
       truckId: Number
     },
-    mostRecent:  null
+    mostRecent:  null,
+    activeTruck: null
   },
   methods: {
-      getCount(status, trucks){
-          var count = 0;
-          if(trucks){
-            for(var i = 0; i <trucks.length; i++){
-                if(trucks[i].status == status){
-                    count++;
+        getCount(status, trucks){
+            var count = 0;
+            if(trucks){
+                for(var i = 0; i <trucks.length; i++){
+                    if(trucks[i].status == status){
+                        count++;
+                    }
                 }
             }
-          }
-          return count;
-      }
-  }
+            return count;
+        },
+        onSetActive(value){
+            this.$emit('onSetActive', value);
+        },
+        onMove(value){
+            this.$emit('moveTruck', value);
+        }
+    }
 }
 </script>

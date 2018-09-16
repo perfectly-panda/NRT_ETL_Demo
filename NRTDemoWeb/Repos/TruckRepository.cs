@@ -87,7 +87,7 @@ namespace NRTDemoWeb.Repos
 
         public Truck CreateTruck(Truck truck)
         {
-            var sql = @"IINSERT [dbo].[Truck]
+            var sql = @"INSERT [dbo].[Truck]
                     ([Pallets],
                     [EnterDCTime])
 	            OUTPUT inserted.TruckId

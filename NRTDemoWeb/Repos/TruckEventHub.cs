@@ -22,9 +22,9 @@ namespace NRTDemoWeb.Repos
             Config = config;
             EhConnectionString = Config["ConnectionStrings:EventHub"];
         }
-        public async void SendTrcuk(Truck truck)
+        public async void SendTruck(Truck truck)
         {
-            _eventHubClient = EventHubClient.CreateFromConnectionString(connectionStringBuilder());
+            _eventHubClient = EventHubClient.CreateFromConnectionString(EhConnectionString);
 
             string json = JsonConvert.SerializeObject(truck);
 

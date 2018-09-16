@@ -57,14 +57,14 @@ namespace NRT_ETL_Demo
                             message.Level = "Info";
                         }
 
-                        message.MessageText = $"Truck {truck.TruckId} unloaded. Unload Time: {span}";
+                        message.MessageText = $"Truck {truck.TruckId} unloaded. Unload Time: {span.Hours}:{span.Minutes}:{span.Seconds}";
                         break;
                     case 6:
-                        var total = (TimeSpan)(truck.EnterDCTime - truck.LeaveDCTime);
+                        var total = (TimeSpan)(truck.LeaveDCTime - truck.EnterDCTime);
 
                         message.Level = "Info";
 
-                        message.MessageText = $"Truck {truck.TruckId} unloaded. Total Time: {total}";
+                        message.MessageText = $"Truck {truck.TruckId} has left. Total Time: {total.Hours}:{total.Minutes}:{total.Seconds}";
                         break;
                 }
 
