@@ -13,7 +13,6 @@ namespace NRTDemoWeb.Repos
     public class TruckEventHub
     {
         private static EventHubClient _eventHubClient;
-        private const string EhEntityPath = "truckevent";
         private readonly IConfiguration Config;
         private string EhConnectionString;
 
@@ -24,20 +23,21 @@ namespace NRTDemoWeb.Repos
         }
         public async void SendTruck(Truck truck)
         {
-            _eventHubClient = EventHubClient.CreateFromConnectionString(EhConnectionString);
+            try
+            {
+                _eventHubClient = EventHubClient.CreateFromConnectionString(EhConnectionString);
 
-            string json = JsonConvert.SerializeObject(truck);
+                string json = JsonConvert.SerializeObject(truck);
 
-            await _eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(json)));
+                await _eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(json)));
 
-            await _eventHubClient.CloseAsync();
-        }
-        
-        private string connectionStringBuilder()
-        {
-            var connString = new EventHubsConnectionStringBuilder(EhConnectionString);
+                await _eventHubClient.CloseAsync();
+            }
 
-            return connString.EntityPath = EhEntityPath;
+        catch(Exception e)
+            {
+                await _eventHubClient.CloseAsync();
+            }
         }
 
     }

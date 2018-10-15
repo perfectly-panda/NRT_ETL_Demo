@@ -6,32 +6,36 @@
         <v-divider></v-divider>
         <v-list dense>
             <v-list-tile>
-            <v-list-tile-content>Truck Id:</v-list-tile-content>
-            <v-list-tile-content class="align-end">{{truck.truckId }}</v-list-tile-content>
+                <v-list-tile-content>Truck Id:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.truckId }}</v-list-tile-content>
+            </v-list-tile>
+             <v-list-tile>
+                <v-list-tile-content>Pallets:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.pallets }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile>
-            <v-list-tile-content>On Location:</v-list-tile-content>
-            <v-list-tile-content class="align-end">{{truck.enterDCTime | formatDate }}</v-list-tile-content>
+                <v-list-tile-content>On Location:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.enterDCTime | formatDate }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile>
-            <v-list-tile-content>OnDock:</v-list-tile-content>
-            <v-list-tile-content class="align-end">{{truck.dockStartTime | formatDate }}</v-list-tile-content>
+                <v-list-tile-content>OnDock:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.dockStartTime | formatDate }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile>
-            <v-list-tile-content>Unloading:</v-list-tile-content>
-            <v-list-tile-content class="align-end">{{truck.unloadStartTime | formatDate }}</v-list-tile-content>
+               <v-list-tile-content>Unloading:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.unloadStartTime | formatDate }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile>
-            <v-list-tile-content>Unload Complete:</v-list-tile-content>
-            <v-list-tile-content class="align-end">{{truck.unloadStopTime | formatDate }}</v-list-tile-content>
+                <v-list-tile-content>Unload Complete:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.unloadStopTime | formatDate }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile>
-            <v-list-tile-content>Left Dock:</v-list-tile-content>
-            <v-list-tile-content class="align-end">{{truck.dockEndTime | formatDate }}</v-list-tile-content>
+                <v-list-tile-content>Left Dock:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.dockEndTime | formatDate }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile>
-            <v-list-tile-content>Left Location:</v-list-tile-content>
-            <v-list-tile-content class="align-end">{{truck.leaveDCTime | formatDate }}</v-list-tile-content>
+                <v-list-tile-content>Left Location:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{truck.leaveDCTime | formatDate }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile class="mb-2">
                 <v-list-tile-content>

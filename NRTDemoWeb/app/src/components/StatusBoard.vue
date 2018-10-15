@@ -7,7 +7,7 @@
                         On Location:
                     </v-card-title>
                     <v-divider></v-divider>
-                    <v-card-text class="display-4">{{getCount(1,trucks)}}</v-card-text>
+                    <v-card-text class="display-2">{{getCount(1,trucks)}}</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs2>
@@ -16,7 +16,7 @@
                         On Dock:
                     </v-card-title>
                     <v-divider></v-divider>
-                    <v-card-text class="display-4">{{getCount(2,trucks)}}</v-card-text>
+                    <v-card-text class="display-2">{{getCount(2,trucks)}}</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs2>
@@ -25,7 +25,7 @@
                         Unloading:
                     </v-card-title>
                     <v-divider></v-divider>
-                    <v-card-text class="display-4">{{getCount(3,trucks)}}</v-card-text>
+                    <v-card-text class="display-2">{{getCount(3,trucks)}}</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs2>
@@ -34,7 +34,7 @@
                         Unload Complete:
                     </v-card-title>
                     <v-divider></v-divider>
-                    <v-card-text class="display-4">{{getCount(4,trucks)}}</v-card-text>
+                    <v-card-text class="display-2">{{getCount(4,trucks)}}</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs2>
@@ -43,7 +43,7 @@
                         Left Dock:
                     </v-card-title>
                     <v-divider></v-divider>
-                    <v-card-text class="display-4">{{getCount(5,trucks)}}</v-card-text>
+                    <v-card-text class="display-2">{{getCount(5,trucks)}}</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs2>
@@ -52,7 +52,7 @@
                         Total On Site:
                     </v-card-title>
                     <v-divider></v-divider>
-                    <v-card-text class="display-4">{{trucks.length}}</v-card-text>
+                    <v-card-text class="display-2">{{trucks.length}}</v-card-text>
                 </v-card>
             </v-flex>
              <v-flex xs4>

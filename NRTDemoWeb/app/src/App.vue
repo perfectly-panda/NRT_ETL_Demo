@@ -23,11 +23,6 @@
           </v-layout>
         </v-container>
       </v-content>
-    <v-footer height="250">
-      <v-layout class="scroll-y">
-        <Notifications v-bind:notifications="notifications"></Notifications>
-        </v-layout>
-    </v-footer>
   </v-app>
 </template>
 
